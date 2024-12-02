@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="12dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/text_synqpay_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        style="@style/TextAppearance.Material3.HeadlineMedium"
+        android:text="Synqpay Demo" />
+
+    <TextView
+        android:id="@+id/text_commander_enabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@style/TextAppearance.Material3.HeadlineSmall"
+        android:text="-" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Ashrait Status"
+        android:id="@+id/button_getAshraitStatus"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Start Transaction"
+            android:id="@+id/button_startTransaction"
+            />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkbox_notify_update"
+            android:text="Notify\nUpdate"
+            android:layout_gravity="center_vertical"
+            />
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Continue Transaction"
+        android:id="@+id/button_continueTransaction"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settlement"
+        android:id="@+id/button_settlement"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:text="Restart Synqpay"
+        android:id="@+id/button_restart"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:text="Print"
+        android:id="@+id/button_print"
+        />
+
+
+
+</LinearLayout>
