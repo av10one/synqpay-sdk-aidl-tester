@@ -3,10 +3,20 @@
 
 Demo code that uses Synqpay SDK. Includes examples of
 
-- Use Synqpay Commander to invoke Synqpay JSON-RPC API over IPC
+- Use Synqpay API to invoke Synqpay JSON-RPC API over IPC
 - Manage Synqpay Service
 - Synqpay PAL (Print Abstract Layer) to use integrated printer
 
+Add Synqpay to your project
+--------------------------------  
+
+The Synqpay SDK is publicly available and hosted on the Maven Central repository. 
+This ensures that developers can easily access and integrate the SDK into their applications, facilitating streamlined development processes.
+
+Android projects:
+```groovy  
+implementation("com.synqpay:synqpay-sdk:1.0")  
+```
 
 Synqpay in 3 steps
 ------------------  
@@ -43,21 +53,24 @@ Synqpay in 3 steps
     ```java
     @Override
         public void onSynqpayConnected() {  
-        this.commander = SynqpaySDK.get().getSynqpayCommander(); 
+        this.api = SynqpaySDK.get().getSynqpayApi(); 
         this.manager = SynqpaySDK.get().getSynqpayManager(); 
-        this.printer = SynqpaySDK.get().getSynqpayPrinter();  
-        try { 
-            this.commander.sendCommand(); 
-        } catch (RemoteException e) {  
-            throw new RuntimeException(e);  
-        }
+        this.printer = SynqpaySDK.get().getSynqpayPrinter();
     } 
     ```
-
-Add Synqpay to your project
---------------------------------  
-
-Android projects:
-```groovy  
-implementation("com.synqpay:synqpay-sdk:0.9")  
-```
+   
+    ```java
+    public void sendRequest() {  
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.
+                    put("jsonrpc","2.0").
+                    put("id","1234").
+                    put("method","getTerminalStatus").
+                    put("params",null);
+        } catch (JSONException e) {}
+        try {
+            api.sendRequest(jsonObject.toString(),responseCallback);
+        } catch (RemoteException ignored) {}
+    } 
+    ```

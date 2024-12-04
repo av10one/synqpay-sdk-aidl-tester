@@ -18,7 +18,7 @@
         android:text="Synqpay Demo" />
 
     <TextView
-        android:id="@+id/text_commander_enabled"
+        android:id="@+id/text_api_enabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -28,8 +28,8 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Get Ashrait Status"
-        android:id="@+id/button_getAshraitStatus"
+        android:text="Get Terminal Status"
+        android:id="@+id/button_getTerminalStatus"
         />
 
     <LinearLayout

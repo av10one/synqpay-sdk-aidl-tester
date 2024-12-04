@@ -10,8 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.synqpay.sdk.CommandListener;
-import com.synqpay.sdk.SynqpayCommander;
+import com.synqpay.sdk.ResponseCallback;
+import com.synqpay.sdk.SynqpayAPI;
 import com.synqpay.sdk.SynqpayManager;
 import com.synqpay.sdk.SynqpayPAL;
 import com.synqpay.sdk.SynqpayPrinter;
@@ -25,13 +25,13 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements SynqpaySDK.ConnectionListener {
 
-    private SynqpayCommander commander;
+    private SynqpayAPI api;
     private SynqpayManager manager;
     private SynqpayPrinter printer;
     private SynqpayStartupNotifier startupNotifier;
 
     private TextView tvBindStatus;
-    private TextView tvCommanderEnabled;
+    private TextView tvApiEnabled;
     private CheckBox cbNotifyUpdate;
 
     @Override
@@ -44,24 +44,24 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
 
 
         tvBindStatus = findViewById(R.id.text_synqpay_status);
-        tvCommanderEnabled = findViewById(R.id.text_commander_enabled);
+        tvApiEnabled = findViewById(R.id.text_api_enabled);
         cbNotifyUpdate = findViewById(R.id.checkbox_notify_update);
 
-        Button btnGetAshraitStatus = findViewById(R.id.button_getAshraitStatus);
-        btnGetAshraitStatus.setOnClickListener(v ->
-                sendCommand(getAshraitStatusCommand(),getStatusListener));
+        Button btnGetTerminalStatus = findViewById(R.id.button_getTerminalStatus);
+        btnGetTerminalStatus.setOnClickListener(v ->
+                sendRequest(getTerminalStatusRequest(),getStatusListener));
 
         Button btnSettlement = findViewById(R.id.button_settlement);
         btnSettlement.setOnClickListener(v ->
-                sendCommand(settlementCommand(),getStatusListener));
+                sendRequest(settlementRequest(),getStatusListener));
 
         Button btnStartTransaction = findViewById(R.id.button_startTransaction);
         btnStartTransaction.setOnClickListener(v ->
-                sendCommand(getStartTransactionCommand(),startTransactionListener));
+                sendRequest(getStartTransactionRequest(),startTransactionListener));
 
         Button btnContinueTransaction = findViewById(R.id.button_continueTransaction);
         btnContinueTransaction.setOnClickListener(v ->
-                sendCommand(getContinueTransactionCommand(),startTransactionListener));
+                sendRequest(getContinueTransactionRequest(),startTransactionListener));
 
 
         Button btnRestart = findViewById(R.id.button_restart);
@@ -87,12 +87,14 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         startupNotifier.stop(this);
     }
 
-    private void sendCommand(String command, CommandListener commandListener) {
-        if (this.commander != null) {
+    private void sendRequest(String request, ResponseCallback responseCallback) {
+        if (this.api != null) {
             try {
-                Log.i("DEMO"," => "+command);
-                commander.sendCommand(command,commandListener);
-            } catch (RemoteException ignored) {}
+                Log.i("DEMO"," => "+request);
+                api.sendRequest(request,responseCallback);
+            } catch (RemoteException ignored) {
+
+            }
         }
     }
 
@@ -105,13 +107,13 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     }
 
 
-    private String getAshraitStatusCommand() {
+    private String getTerminalStatusRequest() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.
                     put("jsonrpc","2.0").
                     put("id","1234").
-                    put("method","getAshraitStatus").
+                    put("method","getTerminalStatus").
                     put("params",null);
         } catch (JSONException e) {
             return "";
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         return jsonObject.toString();
     }
 
-    private String settlementCommand() {
+    private String settlementRequest() {
         JSONObject jsonObject = new JSONObject();
         JSONObject params = new JSONObject();
         try {
@@ -137,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
 
 
 
-    private String getStartTransactionCommand() {
+    private String getStartTransactionRequest() {
         JSONObject jsonObject = new JSONObject();
         JSONObject params = new JSONObject();
         try {
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     }
 
 
-    private String getContinueTransactionCommand() {
+    private String getContinueTransactionRequest() {
         JSONObject jsonObject = new JSONObject();
         JSONObject params = new JSONObject();
         try {
@@ -181,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         return jsonObject.toString();
     }
 
-    private final CommandListener.Stub getStatusListener = new CommandListener.Stub() {
+    private final ResponseCallback.Stub getStatusListener = new ResponseCallback.Stub() {
         @Override
         public void onResponse(String response) {
             Log.i("DEMO"," <= "+response);
@@ -202,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         }
     };
 
-    private final CommandListener.Stub startTransactionListener = new CommandListener.Stub() {
+    private final ResponseCallback.Stub startTransactionListener = new ResponseCallback.Stub() {
         @Override
         public void onResponse(String response) {
             Log.i("DEMO"," <= "+response);
@@ -253,13 +255,13 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
 
     @Override
     public void onSynqpayConnected() {
-        this.commander = SynqpaySDK.get().getSynqpayCommander();
+        this.api = SynqpaySDK.get().getSynqpayAPI();
         this.manager = SynqpaySDK.get().getSynqpayManager();
         this.printer = SynqpaySDK.get().getSynqpayPrinter();
 
         this.tvBindStatus.setText("Synqpay Bounded");
         try {
-            this.tvCommanderEnabled.setText(manager.isCommanderEnabled()?"Commander Enabled":"Commander Disabled");
+            this.tvApiEnabled.setText(manager.isApiEnabled()?"API Enabled":"API Disabled");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -267,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     }
     @Override
     public void onSynqpayDisconnected() {
-        this.commander = null;
+        this.api = null;
         this.tvBindStatus.setText("Synqpay Unbounded");
-        this.tvCommanderEnabled.setText("");
+        this.tvApiEnabled.setText("");
     }
 }
