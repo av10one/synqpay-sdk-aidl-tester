@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         try {
             params
                     .put("paymentMethod","CREDIT_CARD")
-                    .put("tranType","SALE")
+                    .put("transactionType","SALE")
                     .put("referenceId","referenceId")
                     .put("amount",1000)
                     .put("currency",376)
