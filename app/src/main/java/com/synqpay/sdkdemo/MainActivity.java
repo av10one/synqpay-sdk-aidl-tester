@@ -1,5 +1,7 @@
 package com.synqpay.sdkdemo;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
@@ -19,6 +21,7 @@ import com.synqpay.sdk.SynqpaySDK;
 import com.synqpay.sdk.SynqpayStartupNotifier;
 import com.synqpay.sdk.pal.IDocument;
 import com.synqpay.sdk.pal.ILine;
+import com.synqpay.sdk.pal.ImageFrame;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -229,23 +232,76 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     private void print() {
 
         IDocument document = SynqpayPAL.newDocument();
+        document.addImage()
+                .align(SynqpayPAL.Align.CENTER)
+                .image(new ImageFrame(
+                        Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.mcdonalds), 200,200,false)))
+                .spaceBottom(20);
+
         ILine line1 = document.addLine();
-        line1.fillLast(true);
-        line1.addText().text("T1").bold(true);
-        line1.addText().text("T2").bold(true).align(SynqpayPAL.Align.END);
-        line1.spaceTop(10);
+        line1.addText()
+                .text("Hello");
+        line1.addText().text("World!");
+
+        document.addSpace(30);
+
+        document.addLine().addText().text("Fill Last Mode").bold(true);
         document.addDivider(4);
         ILine line2 = document.addLine();
-        line2.addText()
-                .text("HELLO")
-                .weight(1);
-        line2.addText()
-                .text("WORLD")
-                .weight(2);
+        line2.fillLast(true);
+        line2.addText().text("Hello");
+        line2.addText().text("World").align(SynqpayPAL.Align.END);
 
-        document.addSpace(20);
-        document.addLine().align(SynqpayPAL.Align.CENTER).
-                fillLast(true).addText().text("CENTER").bold(true);
+        document.addSpace(30);
+
+        document.addLine().addText().text("Weight Mode").bold(true);
+        document.addDivider(4);
+        ILine line3 = document.addLine();
+        line3.addText().text("Hello").weight(1);
+        line3.addText().text("World").weight(1);
+        ILine line4 = document.addLine();
+        line4.addText().text("Another").weight(1);
+        line4.addText().text("Text of line").weight(1);
+
+        document.addSpace(10);
+
+        ILine line5 = document.addLine();
+        line5.addText().text("ITEM").weight(6);
+        line5.addText().text("QTY").weight(2);
+        line5.addText().text("PRICE").weight(3).align(SynqpayPAL.Align.END);
+
+        ILine line6 = document.addLine();
+        line6.addText().text("Apples").weight(6);
+        line6.addText().text("1kg").weight(2);
+        line6.addText().text("$1.00").weight(3).align(SynqpayPAL.Align.END);
+
+        ILine line7 = document.addLine();
+        line7.addText().text("Coca Cola 1,5l").weight(6);
+        line7.addText().text("3 pcs").weight(2);
+        line7.addText().text("$10.00").weight(3).align(SynqpayPAL.Align.END);
+
+        ILine line8 = document.addLine();
+        line8.addText().text("Bread 1,5l").weight(6);
+        line8.addText().text("3 pcs").weight(2);
+        line8.addText().text("$10.00").weight(3).align(SynqpayPAL.Align.END);
+
+        document.addBarcode()
+                .size(250)
+                .type(SynqpayPAL.BarcodeType.QR_CODE)
+                .content("https://google.com")
+                .spaceBottom(10)
+                .spaceTop(10)
+                .align(SynqpayPAL.Align.CENTER);
+
+        document.addBarcode()
+                .size(40,400)
+                .type(SynqpayPAL.BarcodeType.CODE_128)
+                .content("12345678901234567890")
+                .spaceBottom(10)
+                .spaceTop(10)
+                .align(SynqpayPAL.Align.CENTER);
+
+
         try {
             printer.print(document.bundle());
         } catch (RemoteException e) {
