@@ -318,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         this.tvBindStatus.setText("Synqpay Bounded");
         try {
             this.tvApiEnabled.setText(manager.isApiEnabled()?"API Enabled":"API Disabled");
+            manager.setRedirectActivity(getPackageName(), getClass().getName());
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

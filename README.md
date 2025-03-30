@@ -15,7 +15,7 @@ This ensures that developers can easily access and integrate the SDK into their 
 
 Android projects:
 ```groovy  
-implementation("com.synqpay:synqpay-sdk:1.0")  
+implementation("com.synqpay:synqpay-sdk:1.2")  
 ```
 
 Synqpay in 3 steps
