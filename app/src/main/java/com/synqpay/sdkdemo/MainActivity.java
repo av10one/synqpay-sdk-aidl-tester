@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     private TextView tvBindStatus;
     private TextView tvApiEnabled;
     private CheckBox cbNotifyUpdate;
+    private Button btnDeposit; // Field for the Deposit button
+    private Button btnGetBatchFileStatus; // Field for the Get Batch File Status button
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,16 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
 
         Button btnPrint = findViewById(R.id.button_print);
         btnPrint.setOnClickListener(v -> print());
+
+        // Find the Deposit button and set its OnClickListener
+        btnDeposit = findViewById(R.id.button_deposit);
+        btnDeposit.setOnClickListener(v ->
+                sendRequest(depositRequest(), depositListener));
+
+        // Find the Get Batch File Status button and set its OnClickListener
+        btnGetBatchFileStatus = findViewById(R.id.button_get_batch_file_status);
+        btnGetBatchFileStatus.setOnClickListener(v ->
+                sendRequest(getBatchFileStatusRequest(), getBatchFileStatusListener));
     }
 
     @Override
@@ -124,6 +136,22 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         return jsonObject.toString();
     }
 
+    // Method to create the JSON request for getBatchFileStatus
+    private String getBatchFileStatusRequest() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.
+                    put("jsonrpc", "2.0").
+                    put("id", "1234"). // Using a static ID as in other requests
+                    put("method", "getBatchFileStatus");
+            // No "params" needed for this request
+        } catch (JSONException e) {
+            Log.e("DEMO", "Error creating getBatchFileStatus request JSON", e);
+            return ""; // Return empty string on error
+        }
+        return jsonObject.toString();
+    }
+
     private String settlementRequest() {
         JSONObject jsonObject = new JSONObject();
         JSONObject params = new JSONObject();
@@ -140,7 +168,23 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         return jsonObject.toString();
     }
 
-
+    // Method to create the JSON request for deposit
+    private String depositRequest() {
+        JSONObject jsonObject = new JSONObject();
+        JSONObject params = new JSONObject();
+        try {
+            params.put("host", "SHVA");
+            jsonObject.
+                    put("jsonrpc", "2.0").
+                    put("id", "1234"). // Using a static ID as in other requests
+                    put("method", "deposit").
+                    put("params", params);
+        } catch (JSONException e) {
+            Log.e("DEMO", "Error creating deposit request JSON", e);
+            return ""; // Return empty string on error, consistent with other methods
+        }
+        return jsonObject.toString();
+    }
 
     private String getStartTransactionRequest() {
         JSONObject jsonObject = new JSONObject();
@@ -228,6 +272,74 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         }
     };
 
+    // ResponseCallback for the deposit request
+    private final ResponseCallback.Stub depositListener = new ResponseCallback.Stub() {
+        @Override
+        public void onResponse(String response) {
+            Log.i("DEMO", " <= " + response); // Log the raw response
+            String depositStatus = "Error"; // Default status in case of parsing failure
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                JSONObject jsonResult = jsonResponse.optJSONObject("result");
+                if (jsonResult != null) {
+                    depositStatus = jsonResult.optString("result", "Unknown Status");
+                    // Optionally, parse result.deposit for more details if result.result is "OK"
+                    // For now, just displaying the overall status.
+                }
+            } catch (JSONException e) {
+                Log.e("DEMO", "Error parsing deposit response JSON", e);
+                // depositStatus remains "Error" or "Unknown Status"
+            }
+            final String finalDepositStatus = depositStatus;
+            MainActivity.this.runOnUiThread(() ->
+                    Toast.makeText(
+                            MainActivity.this, "Deposit Result: " + finalDepositStatus, Toast.LENGTH_LONG).show());
+        }
+    };
+
+    // ResponseCallback for the getBatchFileStatus request
+    private final ResponseCallback.Stub getBatchFileStatusListener = new ResponseCallback.Stub() {
+        @Override
+        public void onResponse(String response) {
+            Log.i("DEMO", " <= " + response); // Log the raw response
+            String terminalId = "N/A";
+            int batchFileCount = 0;
+            String message;
+
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                JSONObject jsonResult = jsonResponse.optJSONObject("result");
+                if (jsonResult != null) {
+                    JSONObject mainTerminal = jsonResult.optJSONObject("mainTerminal");
+                    if (mainTerminal != null) {
+                        terminalId = mainTerminal.optString("terminalId", "N/A");
+                        org.json.JSONArray batchFile = mainTerminal.optJSONArray("batchFile");
+                        if (batchFile != null) {
+                            batchFileCount = batchFile.length();
+                        }
+                    }
+                    message = "Terminal ID: " + terminalId + ", Batch Transactions: " + batchFileCount;
+                } else {
+                    // Check for error object if result is null
+                    JSONObject error = jsonResponse.optJSONObject("error");
+                    if (error != null) {
+                        String errorMessage = error.optString("message", "Unknown error");
+                        message = "Error: " + errorMessage;
+                    } else {
+                        message = "Error: Invalid response structure";
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e("DEMO", "Error parsing getBatchFileStatus response JSON", e);
+                message = "Error parsing response.";
+            }
+
+            final String finalMessage = message;
+            MainActivity.this.runOnUiThread(() ->
+                    Toast.makeText(
+                            MainActivity.this, finalMessage, Toast.LENGTH_LONG).show());
+        }
+    };
 
     private void print() {
 
