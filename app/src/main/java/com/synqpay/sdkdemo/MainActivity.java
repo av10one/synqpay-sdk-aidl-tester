@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.synqpay.sdk.ResponseCallback;
 import com.synqpay.sdk.SynqpayAPI;
+import com.synqpay.sdk.SynqpayDevice;
 import com.synqpay.sdk.SynqpayManager;
 import com.synqpay.sdk.SynqpayPAL;
 import com.synqpay.sdk.SynqpayPrinter;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     private SynqpayAPI api;
     private SynqpayManager manager;
     private SynqpayPrinter printer;
+    private SynqpayDevice device;
     private SynqpayStartupNotifier startupNotifier;
 
     private TextView tvBindStatus;
@@ -490,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         this.api = SynqpaySDK.get().getSynqpayAPI();
         this.manager = SynqpaySDK.get().getSynqpayManager();
         this.printer = SynqpaySDK.get().getSynqpayPrinter();
+        this.device = SynqpaySDK.get().getSynqpayDevice();
 
         this.tvBindStatus.setText("Synqpay Bounded");
         try {
