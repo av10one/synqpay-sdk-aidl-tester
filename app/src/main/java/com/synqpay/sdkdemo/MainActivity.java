@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
                 sendRequest(settlementRequest(),getStatusListener));
 
         Button btnStartTransaction = findViewById(R.id.button_startTransaction);
-        // Modified to call the dialog first
+        //btnStartTransaction.setOnClickListener(v ->
+                //sendRequest(getStartTransactionRequest(),startTransactionListener));
         btnStartTransaction.setOnClickListener(v -> showReferenceIdInputDialog());
 
         Button btnContinueTransaction = findViewById(R.id.button_continueTransaction);
@@ -233,8 +234,6 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     }
 
     // Method to create the JSON request for deposit
-    // TODO: Modify getStartTransactionRequest to accept a referenceId parameter
-    // For now, the existing getStartTransactionRequest will be used by the dialog's OK button placeholder.
     private String depositRequest() {
         JSONObject jsonObject = new JSONObject();
         JSONObject params = new JSONObject();
@@ -275,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         }
         return jsonObject.toString();
     }
-
 
     private String getContinueTransactionRequest() {
         JSONObject jsonObject = new JSONObject();
