@@ -5,8 +5,18 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
+import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.os.RemoteException;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +35,8 @@ import com.synqpay.sdk.pal.ImageFrame;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements SynqpaySDK.ConnectionListener {
 
@@ -61,8 +73,8 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
                 sendRequest(settlementRequest(),getStatusListener));
 
         Button btnStartTransaction = findViewById(R.id.button_startTransaction);
-        btnStartTransaction.setOnClickListener(v ->
-                sendRequest(getStartTransactionRequest(),startTransactionListener));
+        // Modified to call the dialog first
+        btnStartTransaction.setOnClickListener(v -> showReferenceIdInputDialog());
 
         Button btnContinueTransaction = findViewById(R.id.button_continueTransaction);
         btnContinueTransaction.setOnClickListener(v ->
@@ -100,6 +112,56 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         if (this.manager != null)
             SynqpaySDK.get().unbindService();
         startupNotifier.stop(this);
+    }
+
+    private void showReferenceIdInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_reference_id, null);
+        builder.setView(dialogView);
+
+        RadioGroup rgReferenceIdOptions = dialogView.findViewById(R.id.rg_reference_id_options);
+        RadioButton rbGenerateUuid = dialogView.findViewById(R.id.rb_generate_uuid);
+        RadioButton rbEnterManually = dialogView.findViewById(R.id.rb_enter_manually);
+        EditText etManualReferenceId = dialogView.findViewById(R.id.et_manual_reference_id);
+
+        rgReferenceIdOptions.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rb_enter_manually) {
+                etManualReferenceId.setVisibility(View.VISIBLE);
+            } else {
+                etManualReferenceId.setVisibility(View.GONE);
+            }
+        });
+
+        builder.setTitle("Set Transaction Reference ID");
+        builder.setPositiveButton("OK", null); // Will be overridden
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Override the positive button listener
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String referenceId = "";
+            // Re-find views from dialogView to ensure they are correctly scoped for the listener
+            RadioButton rbGenerate = dialogView.findViewById(R.id.rb_generate_uuid);
+            EditText etManual = dialogView.findViewById(R.id.et_manual_reference_id);
+
+            if (rbGenerate.isChecked()) {
+                referenceId = UUID.randomUUID().toString();
+                // Toast.makeText(MainActivity.this, "Using UUID: " + referenceId, Toast.LENGTH_SHORT).show(); // Removed
+            } else {
+                referenceId = etManual.getText().toString().trim();
+                if (referenceId.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Manual Reference ID cannot be empty", Toast.LENGTH_SHORT).show();
+                    return; // Don't dismiss if manual is chosen but empty
+                }
+                // Toast.makeText(MainActivity.this, "Using Manual ID: " + referenceId, Toast.LENGTH_SHORT).show(); // Removed
+            }
+
+            String transactionRequest = getStartTransactionRequest(referenceId);
+            sendRequest(transactionRequest, startTransactionListener);
+            dialog.dismiss();
+        });
     }
 
     private void sendRequest(String request, ResponseCallback responseCallback) {
@@ -169,6 +231,8 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     }
 
     // Method to create the JSON request for deposit
+    // TODO: Modify getStartTransactionRequest to accept a referenceId parameter
+    // For now, the existing getStartTransactionRequest will be used by the dialog's OK button placeholder.
     private String depositRequest() {
         JSONObject jsonObject = new JSONObject();
         JSONObject params = new JSONObject();
@@ -186,14 +250,14 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         return jsonObject.toString();
     }
 
-    private String getStartTransactionRequest() {
+    private String getStartTransactionRequest(String referenceId) { // Signature changed
         JSONObject jsonObject = new JSONObject();
         JSONObject params = new JSONObject();
         try {
             params
                     .put("paymentMethod","CREDIT_CARD")
                     .put("transactionType","SALE")
-                    .put("referenceId","referenceId")
+                    .put("referenceId", referenceId) // Use the parameter here
                     .put("amount",1000)
                     .put("currency",376)
                     .put("notifyUpdate",cbNotifyUpdate.isChecked())
