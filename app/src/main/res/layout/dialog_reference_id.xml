@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Reference ID Option:"
+        android:layout_marginBottom="8dp"/>
+
+    <RadioGroup
+        android:id="@+id/rg_reference_id_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_generate_uuid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Generate UUID"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/rb_enter_manually"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Manually"/>
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/et_manual_reference_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Reference ID"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>
