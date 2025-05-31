@@ -69,6 +69,18 @@
         />
 
     <Button
+        android:id="@+id/button_deposit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Deposit" />
+
+    <Button
+        android:id="@+id/button_get_batch_file_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Batch File Status" />
+
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.Button.OutlinedButton"
