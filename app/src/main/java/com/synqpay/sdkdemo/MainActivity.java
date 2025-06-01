@@ -6,11 +6,6 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 import android.app.AlertDialog;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -48,8 +43,6 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     private TextView tvBindStatus;
     private TextView tvApiEnabled;
     private CheckBox cbNotifyUpdate;
-    private Button btnDeposit; // Field for the Deposit button
-    private Button btnGetBatchFileStatus; // Field for the Get Batch File Status button
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,12 +81,14 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         btnPrint.setOnClickListener(v -> print());
 
         // Find the Deposit button and set its OnClickListener
-        btnDeposit = findViewById(R.id.button_deposit);
+        // Field for the Deposit button
+        Button btnDeposit = findViewById(R.id.button_deposit);
         btnDeposit.setOnClickListener(v ->
                 sendRequest(depositRequest(), depositListener));
 
         // Find the Get Batch File Status button and set its OnClickListener
-        btnGetBatchFileStatus = findViewById(R.id.button_get_batch_file_status);
+        // Field for the Get Batch File Status button
+        Button btnGetBatchFileStatus = findViewById(R.id.button_get_batch_file_status);
         btnGetBatchFileStatus.setOnClickListener(v ->
                 sendRequest(getBatchFileStatusRequest(), getBatchFileStatusListener));
     }
@@ -120,8 +115,6 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         builder.setView(dialogView);
 
         RadioGroup rgReferenceIdOptions = dialogView.findViewById(R.id.rg_reference_id_options);
-        RadioButton rbGenerateUuid = dialogView.findViewById(R.id.rb_generate_uuid);
-        RadioButton rbEnterManually = dialogView.findViewById(R.id.rb_enter_manually);
         EditText etManualReferenceId = dialogView.findViewById(R.id.et_manual_reference_id);
 
         rgReferenceIdOptions.setOnCheckedChangeListener((group, checkedId) -> {
@@ -350,12 +343,12 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
                 return; // Stop on parsing error
             }
             // Ensure resultText is not null or empty before showing to avoid "Terminal ID: " with no status
-            final String finalResultText = resultText == null || resultText.isEmpty() ? "Unknown status" : resultText;
-            final String finalTerminalId = terminalId == null || terminalId.isEmpty() ? "N/A" : terminalId;
+            //final String finalResultText = resultText == null || resultText.isEmpty() ? "Unknown status" : resultText;
+            //final String finalTerminalId = terminalId == null || terminalId.isEmpty() ? "N/A" : terminalId;
 
-            MainActivity.this.runOnUiThread(()
-                    -> Toast.makeText(
-                    MainActivity.this,finalTerminalId+" :"+finalResultText,Toast.LENGTH_LONG).show());
+            //MainActivity.this.runOnUiThread(()
+              //      -> Toast.makeText(
+                //    MainActivity.this,finalTerminalId+" :"+finalResultText,Toast.LENGTH_LONG).show());
         }
     };
 
