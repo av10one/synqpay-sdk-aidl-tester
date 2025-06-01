@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         @Override
         public void onResponse(String response) {
             Log.i("DEMO"," <= "+response);
-            String terminalId, resultText; // Renamed 'result' to 'resultText' to avoid confusion
+            //String terminalId, resultText; // Renamed 'result' to 'resultText' to avoid confusion
             try {
                 JSONObject jsonResponse = new JSONObject(response);
 
@@ -332,10 +332,10 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
                 if (jsonResult == null) { // If no result and no specific error handled above, show generic message or log
                     MainActivity.this.runOnUiThread(() ->
                             Toast.makeText(MainActivity.this, "Transaction Status: No result data", Toast.LENGTH_LONG).show());
-                    return;
+                    //return;
                 }
-                terminalId = jsonResult.optString("terminalId","");
-                resultText = jsonResult.optString("transactionStatus","");
+                //terminalId = jsonResult.optString("terminalId","");
+                //resultText = jsonResult.optString("transactionStatus","");
             } catch (JSONException e) {
                 Log.e("DEMO", "Error parsing startTransaction response JSON", e);
                 MainActivity.this.runOnUiThread(() ->
