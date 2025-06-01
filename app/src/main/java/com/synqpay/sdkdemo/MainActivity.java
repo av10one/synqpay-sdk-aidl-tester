@@ -405,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
                             batchFileCount = batchFile.length();
                         }
                     }
-                    message = "Terminal ID: " + terminalId + ", Batch Transactions: " + batchFileCount;
+                    message = "Terminal ID: " + terminalId + "\n\nBatch Transactions: " + batchFileCount;
                 } else {
                     // Check for error object if result is null
                     JSONObject error = jsonResponse.optJSONObject("error");
