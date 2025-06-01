@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.synqpay.sdk.ResponseCallback;
 import com.synqpay.sdk.SynqpayAPI;
-import com.synqpay.sdk.SynqpayDevice;
 import com.synqpay.sdk.SynqpayManager;
 import com.synqpay.sdk.SynqpayPAL;
 import com.synqpay.sdk.SynqpayPrinter;
@@ -44,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
     private SynqpayAPI api;
     private SynqpayManager manager;
     private SynqpayPrinter printer;
-    private SynqpayDevice device;
     private SynqpayStartupNotifier startupNotifier;
 
     private TextView tvBindStatus;
@@ -321,20 +319,43 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         @Override
         public void onResponse(String response) {
             Log.i("DEMO"," <= "+response);
-            String terminalId,result;
+            String terminalId, resultText; // Renamed 'result' to 'resultText' to avoid confusion
             try {
                 JSONObject jsonResponse = new JSONObject(response);
+
+                // Check for error first
+                JSONObject errorObject = jsonResponse.optJSONObject("error");
+                if (errorObject != null) {
+                    int errorCode = errorObject.optInt("code");
+                    String errorMessage = errorObject.optString("message");
+                    if (errorCode == 303 && "Transaction Already Exist".equals(errorMessage)) {
+                        MainActivity.this.runOnUiThread(() ->
+                                Toast.makeText(MainActivity.this, "Error: Transaction Reference ID already exists. Please use a different ID.", Toast.LENGTH_LONG).show());
+                        return; // Stop further processing
+                    }
+                }
+
                 JSONObject jsonResult = jsonResponse.optJSONObject("result");
-                if (jsonResult == null)
+                if (jsonResult == null) { // If no result and no specific error handled above, show generic message or log
+                    MainActivity.this.runOnUiThread(() ->
+                            Toast.makeText(MainActivity.this, "Transaction Status: No result data", Toast.LENGTH_LONG).show());
                     return;
+                }
                 terminalId = jsonResult.optString("terminalId","");
-                result = jsonResult.optString("transactionStatus","");
+                resultText = jsonResult.optString("transactionStatus","");
             } catch (JSONException e) {
-                throw new RuntimeException(e);
+                Log.e("DEMO", "Error parsing startTransaction response JSON", e);
+                MainActivity.this.runOnUiThread(() ->
+                        Toast.makeText(MainActivity.this, "Error parsing transaction response.", Toast.LENGTH_LONG).show());
+                return; // Stop on parsing error
             }
+            // Ensure resultText is not null or empty before showing to avoid "Terminal ID: " with no status
+            final String finalResultText = resultText == null || resultText.isEmpty() ? "Unknown status" : resultText;
+            final String finalTerminalId = terminalId == null || terminalId.isEmpty() ? "N/A" : terminalId;
+
             MainActivity.this.runOnUiThread(()
                     -> Toast.makeText(
-                    MainActivity.this,terminalId+" :"+result,Toast.LENGTH_LONG).show());
+                    MainActivity.this,finalTerminalId+" :"+finalResultText,Toast.LENGTH_LONG).show());
         }
     };
 
@@ -492,7 +513,6 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
         this.api = SynqpaySDK.get().getSynqpayAPI();
         this.manager = SynqpaySDK.get().getSynqpayManager();
         this.printer = SynqpaySDK.get().getSynqpayPrinter();
-        this.device = SynqpaySDK.get().getSynqpayDevice();
 
         this.tvBindStatus.setText("Synqpay Bounded");
         try {

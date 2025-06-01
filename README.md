@@ -15,7 +15,7 @@ This ensures that developers can easily access and integrate the SDK into their 
 
 Android projects:
 ```groovy  
-implementation("com.synqpay:synqpay-sdk:1.3")  
+implementation("com.synqpay:synqpay-sdk:1.2")
 ```
 
 Synqpay in 3 steps
@@ -56,7 +56,6 @@ Synqpay in 3 steps
         this.api = SynqpaySDK.get().getSynqpayApi(); 
         this.manager = SynqpaySDK.get().getSynqpayManager(); 
         this.printer = SynqpaySDK.get().getSynqpayPrinter();
-        this.device = SynqpaySDK.get().getSynqpayDevice();
     } 
     ```
    
