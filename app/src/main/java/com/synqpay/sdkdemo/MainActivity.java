@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements SynqpaySDK.Connec
                     String errorMessage = errorObject.optString("message");
                     if (errorCode == 303 && "Transaction Already Exist".equals(errorMessage)) {
                         MainActivity.this.runOnUiThread(() ->
-                                Toast.makeText(MainActivity.this, "Error: Transaction Reference ID already exists. Please use a different ID.", Toast.LENGTH_LONG).show());
+                                Toast.makeText(MainActivity.this, "Use a unique ID", Toast.LENGTH_LONG).show());
                         return; // Stop further processing
                     }
                 }
